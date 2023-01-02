@@ -10,14 +10,14 @@ class BattleshipsGame:
         self.hidden_board = []
         
         if self.difficulty == "easy":
-            self.board_size = 4
-            self.num_ships = 4
-        elif self.difficulty == "medium":
             self.board_size = 6
             self.num_ships = 6
-        elif self.difficulty == "hard":
+        elif self.difficulty == "medium":
             self.board_size = 8
             self.num_ships = 8
+        elif self.difficulty == "hard":
+            self.board_size = 12
+            self.num_ships = 12
         
         self.initialize_board()
         self.place_ships()
@@ -70,7 +70,7 @@ class BattleshipsGame:
 
 def main():
     # Modified welcome message
-    print("Welcome to Battleships! In this game, you will try to sink the computer's battleships by entering the row and column of the grid you want to attack. The computer will do the same to your battleships. The first player to sink all of the other player's battleships wins. Good luck! Enter Q at any time to quit.")
+    print("Welcome to Python CLI Battleships!\n---------------------------------------------------\nIn this game, you will try to sink the computer's battleships\n---------------------------------------------------\nEnter the row and column of the grid you want to attack.\n---------------------------------------------------\nThe computer will do the same to your battleships.\n---------------------------------------------------\nThe first player to sink all of the other player's battleships wins. Good luck!")
     # Flag to track whether user has quit the game
     quit = False
     while not quit:
@@ -83,10 +83,11 @@ def main():
             game = BattleshipsGame(difficulty)
             while not game.check_win():
                 game.print_user_board()
+                
                 # Check if player wants to quit
                 row_input = input("Enter row (0-{}) or Q to quit: ".format(game.board_size - 1))
                 if row_input.upper() == "Q":
-                    print("Goodbye! Quitter.")
+                    print("Goodbye!")
                     break
                 else:
                     row = int(row_input)
@@ -95,13 +96,17 @@ def main():
                         row = int(input("Enter row (0-{}): ".format(game.board_size - 1)))
                 col_input = input("Enter column (0-{}) or Q to quit: ".format(game.board_size - 1))
                 if col_input.upper() == "Q":
-                    print("Goodbye! Quitter.")
+                    print("Goodbye!")
                     break
                 else:
                     col = int(col_input)
                     while col < 0 or col >= game.board_size:
                         print("Invalid column. Please enter a valid column.")
                         col = int(input("Enter column (0-{}): ".format(game.board_size - 1)))
+                    while col < 0 or col >= game.board_size:
+                        print("Invalid column. Please enter a valid column.")
+                        col = int(input("Enter column (0-{}): ".format(game.board_size - 1)))
+
                 if game.check_shot(row, col):
                     print("Hit!")
                 else:
