@@ -13,8 +13,8 @@ class BattleshipsGame:
         self.hidden_computer_board = []
         
         if self.difficulty == "easy":
-            self.board_size = 6
-            self.num_ships = 6
+            self.board_size = 2
+            self.num_ships = 2
         elif self.difficulty == "medium":
             self.board_size = 8
             self.num_ships = 8
@@ -66,18 +66,34 @@ class BattleshipsGame:
                     self.hidden_computer_board[row][col] = "S"
                     placed = True
 
-    def check_shot(self, row, col):
-        if (row, col) in self.ships:
+    def check_shot_user(self, row, col):
+        if (row, col) in self.user_ships:
             self.user_board[row][col] = "X"
             self.hidden_user_board[row][col] = "X"
             return True
         else:
-            self.board[row][col] = "M"
+            self.user_board[row][col] = "M"
             self.hidden_user_board[row][col] = "M"
             return False
 
-    def check_win(self):
+    def check_win_user(self):
         for row in self.hidden_user_board:
+            if "S" in row:
+                return False
+        return True
+
+    def check_shot_computer(self, row, col):
+        if (row, col) in self.user_ships:
+            self.user_board[row][col] = "X"
+            self.hidden_user_board[row][col] = "X"
+            return True
+        else:
+            self.user_board[row][col] = "M"
+            self.hidden_user_board[row][col] = "M"
+            return False
+
+    def check_win_computer(self):
+        for row in self.hidden_computer_board:
             if "S" in row:
                 return False
         return True
@@ -91,6 +107,18 @@ class BattleshipsGame:
         print("Computer's board:")
         for row in self.computer_board:
             print(" ".join(row))
+
+    def computer_turn(self, board_size, user_board):
+        placed = False
+        while not placed:
+            comp_row = random.randint(0, board_size - 1)
+            comp_col = random.randint(0, board_size - 1)
+        if user_board[comp_row][comp_col] == "O":
+            user_board[comp_row][comp_col] = "X"
+        else:
+            user_board[comp_row][comp_col] = "M"
+            placed = True
+        return user_board
 
 
 def main():
@@ -106,9 +134,11 @@ def main():
             while difficulty not in ["easy", "medium", "hard"]:
                 difficulty = input("Enter difficulty level (easy, medium, hard): ").lower()
             game = BattleshipsGame(difficulty)
-            while not game.check_win():
+            while not game.check_win_user():
                 game.print_user_board()
+            
                 game.print_computer_board()
+            
                 
                 # Check if player wants to quit
                 row_input = input("Enter row (0-{}) or Q to quit: ".format(game.board_size - 1))
@@ -132,31 +162,30 @@ def main():
                     while col < 0 or col >= game.board_size:
                         print("Invalid column. Please enter a valid column.")
                         col = int(input("Enter column (0-{}): ".format(game.board_size - 1)))
-                if game.check_shot(row, col):
+                if game.check_shot_user(row, col):
                     print("Hit!")
                 else:
                     print("Miss!")
                 # Computer's turn
                 placed = False
             while not placed:
-                    comp_row = random.randint(0, game.board_size - 1)
-                    comp_col = random.randint(0, game.board_size - 1)
-                    if game.board[comp_row][comp_col] == "O":
-                        if game.check_shot(comp_row, comp_col):
-                            print("Computer hit your battleship!")
-                        else:
-                            print("Computer missed.")
-                    placed = True
+                comp_row = random.randint(0, game.board_size - 1)
+                comp_col = random.randint(0, game.board_size - 1)
+                if game.user_board[comp_row][comp_col] == "O":
+                    if game.check_shot(comp_row, comp_col):
+                        print("Computer hit your battleship!")
+                else:
+                    print("Computer missed.")
+            placed = True
             # Print computer's board after each turn
-                    game.print_computer_board()
-                    if game.check_win():
-                        game.print_user_board()
-                        print("You won!")
-                    else:
-                        game.print_computer_board()
-                        print("Computer won :(")
+            game.print_computer_board()
+            if game.check_win():
+                game.print_user_board()
+                print("You won!")
+            else:
+                game.print_computer_board()
+                print("Computer won :(")
 
 main()
-
 
 
