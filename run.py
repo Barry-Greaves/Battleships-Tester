@@ -5,9 +5,12 @@ class BattleshipsGame:
         self.difficulty = difficulty
         self.board_size = 0
         self.num_ships = 0
-        self.board = []
-        self.ships = []
-        self.hidden_board = []
+        self.user_board = []
+        self.computer_board = []
+        self.user_ships = []
+        self.computer_ships = []
+        self.hidden_user_board = []
+        self.hidden_computer_board = []
         
         if self.difficulty == "easy":
             self.board_size = 6
@@ -19,52 +22,74 @@ class BattleshipsGame:
             self.board_size = 12
             self.num_ships = 12
         
-        self.initialize_board()
-        self.place_ships()
+        self.initialize_user_board()
+        self.place_ships_user()
+        self.initialize_computer_board()
+        self.place_ships_computer()
 
-    def initialize_board(self):
+    def initialize_user_board(self):
         for i in range(self.board_size):
-            self.board.append([])
-            self.hidden_board.append([])
+            self.user_board.append([])
+            self.hidden_user_board.append([])
             for j in range(self.board_size):
-                self.board[i].append(".")
-                self.hidden_board[i].append(".")
+                self.user_board[i].append(".")
+                self.hidden_user_board[i].append(".")
+    
+    def initialize_computer_board(self):
+        for i in range(self.board_size):
+            self.computer_board.append([])
+            self.hidden_computer_board.append([])
+            for j in range(self.board_size):
+                self.computer_board[i].append(".")
+                self.hidden_computer_board[i].append(".")
 
-    def place_ships(self):
+    def place_ships_user(self):
         for i in range(self.num_ships):
             placed = False
             while not placed:
                 row = random.randint(0, self.board_size - 1)
                 col = random.randint(0, self.board_size - 1)
-                if self.hidden_board[row][col] == ".":
-                    self.ships.append((row, col))
-                    self.hidden_board[row][col] = "S"
+                if self.hidden_user_board[row][col] == ".":
+                    self.user_ships.append((row, col))
+                    self.hidden_user_board[row][col] = "S"
+                    placed = True
+
+
+    def place_ships_computer(self):
+        for i in range(self.num_ships):
+            placed = False
+            while not placed:
+                row = random.randint(0, self.board_size - 1)
+                col = random.randint(0, self.board_size - 1)
+                if self.hidden_computer_board[row][col] == ".":
+                    self.computer_ships.append((row, col))
+                    self.hidden_computer_board[row][col] = "S"
                     placed = True
 
     def check_shot(self, row, col):
         if (row, col) in self.ships:
-            self.board[row][col] = "X"
-            self.hidden_board[row][col] = "X"
+            self.user_board[row][col] = "X"
+            self.hidden_user_board[row][col] = "X"
             return True
         else:
             self.board[row][col] = "M"
-            self.hidden_board[row][col] = "M"
+            self.hidden_user_board[row][col] = "M"
             return False
 
     def check_win(self):
-        for row in self.hidden_board:
+        for row in self.hidden_user_board:
             if "S" in row:
                 return False
         return True
 
     def print_user_board(self):
         print("Your board:")
-        for row in self.board:
+        for row in self.user_board:
             print(" ".join(row))
 
     def print_computer_board(self):
         print("Computer's board:")
-        for row in self.hidden_board:
+        for row in self.computer_board:
             print(" ".join(row))
 
 
@@ -83,6 +108,7 @@ def main():
             game = BattleshipsGame(difficulty)
             while not game.check_win():
                 game.print_user_board()
+                game.print_computer_board()
                 
                 # Check if player wants to quit
                 row_input = input("Enter row (0-{}) or Q to quit: ".format(game.board_size - 1))
@@ -106,14 +132,13 @@ def main():
                     while col < 0 or col >= game.board_size:
                         print("Invalid column. Please enter a valid column.")
                         col = int(input("Enter column (0-{}): ".format(game.board_size - 1)))
-
                 if game.check_shot(row, col):
                     print("Hit!")
                 else:
                     print("Miss!")
                 # Computer's turn
                 placed = False
-                while not placed:
+            while not placed:
                     comp_row = random.randint(0, game.board_size - 1)
                     comp_col = random.randint(0, game.board_size - 1)
                     if game.board[comp_row][comp_col] == "O":
@@ -123,15 +148,13 @@ def main():
                             print("Computer missed.")
                     placed = True
             # Print computer's board after each turn
-            game.print_computer_board()
-        if game.check_win():
-            game.print_user_board()
-            print("You won!")
-        else:
-            game.print_computer_board()
-            print("Computer won :(")
-    else:
-        print("Goodbye!")
+                    game.print_computer_board()
+                    if game.check_win():
+                        game.print_user_board()
+                        print("You won!")
+                    else:
+                        game.print_computer_board()
+                        print("Computer won :(")
 
 main()
 
